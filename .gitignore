@@ -1,0 +1,32 @@
+# file: .gitignore
+
+# File di ambiente - NON CARICARE MAI QUESTO FILE!
+.env
+
+# Credenziali di servizio di Firebase - NON CARICARE MAI QUESTO FILE!
+firebase-credentials.json
+
+# Directory di cache di Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ambienti virtuali
+venv/
+.venv/
+env/
+ENV/
+
+# File specifici del sistema operativo
+.DS_Store
+Thumbs.db
+
+# File di configurazione degli editor
+.idea/
+.vscode/
+
+# File di build e distribuzione
+/dist
+/build
+*.egg-info

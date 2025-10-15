@@ -1,0 +1,17 @@
+# file: requirements.txt
+
+# Framework web
+fastapi
+uvicorn[standard]
+
+# Database e ORM
+sqlalchemy
+psycopg2-binary
+python-dotenv
+
+# Autenticazione e Sicurezza
+firebase-admin
+python-jose[cryptography]
+
+# Necessario se non l'hai già incluso, per EmailStr
+pydantic[email]
