@@ -2,7 +2,10 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 from routers import users, faculty, course, notes, admin # Assicurati di importare tutti i router
+
+load_dotenv()
 
 app = FastAPI(
     title="UniAdvisor API",
