@@ -68,4 +68,12 @@ def get_current_user(db: Session = Depends(get_db), credentials: HTTPAuthorizati
     decoded_token = verify_firebase_token(id_token, credentials_exception)
     firebase_uid = decoded_token.get("user_id")
     
-    if firebase_uid
+    if firebase_uid is None:
+        raise credentials_exception
+        
+    user = db.query(User).filter(User.firebase_uid == firebase_uid).first()
+    
+    if user is None:
+        raise credentials_exception
+    
+    return user
