@@ -34,12 +34,32 @@ def upload_note(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    
+    # 🔍 DEBUG - Log ricevuti
+    print("=" * 50)
+    print("📤 UPLOAD NOTE REQUEST")
+    print(f"📊 User ID: {current_user.id}")
+    print(f"📊 User Email: {current_user.email}")
+    print(f"📊 User Faculty ID: {current_user.faculty_id}")
+    print(f"📊 Requested Course ID: {note_data.course_id}")
+    print(f"📊 Description: {note_data.description}")
+    print(f"📊 File ID: {note_data.file_id}")
+    print("=" * 50)
+
     course = db.query(Course).filter(Course.id == note_data.course_id).first()
     if not course:
+        print("❌ Course not found!")
         raise HTTPException(status_code=404, detail="Course not found.")
+    
+    print(f"📊 Course Faculty ID: {course.faculty_id}")
+    print(f"📊 Faculty Match: {course.faculty_id == current_user.faculty_id}")
+    print(f"📊 Faculty Types: user={type(current_user.faculty_id)}, course={type(course.faculty_id)}")
 
     if course.faculty_id != current_user.faculty_id:
+        print("❌ Faculty mismatch - 403!")
         raise HTTPException(status_code=403, detail="You are not authorized to upload notes for this course.")
+
+    print("✅ All checks passed, creating note...") # Debug
 
     new_note = Note(
         course_id=note_data.course_id,
@@ -51,6 +71,13 @@ def upload_note(
     db.add(new_note)
     db.commit()
     db.refresh(new_note)
+
+    print("✅ Note created successfully!")
+    print("=" * 50)
+    print(f"📊 Created Note ID: {new_note.id}")
+    print(f"📊 Created Note Description: {new_note.description}")
+    print(f"📊 Created Note File ID: {new_note.file_id}")
+    print("=" * 50)
 
     return new_note
 

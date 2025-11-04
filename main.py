@@ -46,3 +46,10 @@ app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 def read_root():
     """Endpoint di benvenuto per verificare che l'API sia online."""
     return {"message": "Benvenuto sull'API di UniAdvisor!"}
+
+# Permetti tutte le origini in sviluppo
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "*"  # Permetti TUTTO (ok per sviluppo, specifica in produzione)
+]

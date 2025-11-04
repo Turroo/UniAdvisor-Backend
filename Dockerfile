@@ -24,4 +24,4 @@ EXPOSE 8000
 # Uvicorn è il server ASGI che esegue FastAPI.
 # --host 0.0.0.0 è fondamentale per rendere l'app accessibile dall'esterno del container.
 # --port 8000 è la porta standard.
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}

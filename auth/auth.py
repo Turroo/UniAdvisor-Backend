@@ -32,13 +32,12 @@ def verify_firebase_token(id_token: str, credentials_exception):
     Altrimenti, solleva un'eccezione.
     """
     try:
-        # verify_id_token si occupa di tutta la magia: controlla la firma,
-        # la scadenza e che il token sia stato emesso dal tuo progetto Firebase.
+        print(f"🔍 Verifying token with Firebase Admin SDK...")
         decoded_token = auth.verify_id_token(id_token)
+        print(f"✅ Token verified, UID: {decoded_token.get('user_id')}")
         return decoded_token
     except Exception as e:
-        # L'eccezione può essere per token scaduto, non valido, ecc.
-        print(f"Firebase token verification failed: {e}") # Utile per il debug
+        print(f"❌ Firebase token verification error: {type(e).__name__}: {e}")
         raise credentials_exception
 
 
@@ -47,6 +46,9 @@ def get_current_user(db: Session = Depends(get_db), credentials: HTTPAuthorizati
     Dependency per FastAPI: prende il token Bearer, lo verifica con Firebase
     e restituisce l'utente corrispondente dal database SQL.
     """
+    print("=" * 80)
+    print("🔐 GET_CURRENT_USER CALLED")
+    
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -55,23 +57,32 @@ def get_current_user(db: Session = Depends(get_db), credentials: HTTPAuthorizati
     
     # 1. Prendi l'ID Token dall'header Authorization
     id_token = credentials.credentials
+    print(f"📊 Token received (first 50 chars): {id_token[:50]}..." if id_token else "❌ NO TOKEN!")
     
     # 2. Verifica il token con Firebase
-    decoded_token = verify_firebase_token(id_token, credentials_exception)
+    try:
+        decoded_token = verify_firebase_token(id_token, credentials_exception)
+        print(f"✅ Token verified successfully")
+    except Exception as e:
+        print(f"❌ Token verification failed: {e}")
+        raise credentials_exception
     
     # 3. Estrai l'UID di Firebase dal token. La chiave è "user_id".
     firebase_uid = decoded_token.get("user_id")
+    print(f"📊 Firebase UID from token: {firebase_uid}")
+    
     if firebase_uid is None:
+        print("❌ Firebase UID is None!")
         raise credentials_exception
         
     # 4. Cerca l'utente nel TUO database SQL usando il firebase_uid
     user = db.query(User).filter(User.firebase_uid == firebase_uid).first()
     
-    # 5. Se non trovi l'utente nel tuo DB, significa che si è registrato
-    #    su Firebase ma il processo di creazione del profilo nella tua API non è andato a buon fine.
-    #    In un'app reale, potresti voler gestire questo caso (es. creando il profilo ora).
-    #    Per ora, lo trattiamo come un errore di autorizzazione.
     if user is None:
+        print(f"❌ User not found in database for UID: {firebase_uid}")
         raise credentials_exception
+    
+    print(f"✅ User found: ID={user.id}, Email={user.email}, Faculty={user.faculty_id}")
+    print("=" * 80)
     
     return user
