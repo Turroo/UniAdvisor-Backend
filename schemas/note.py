@@ -12,13 +12,14 @@ class NoteCreate(BaseModel):
     file_id: HttpUrl # Pydantic valida che sia un URL valido
 
 # Schema per la risposta
-class NoteResponse(BaseModel):
+class NoteWithRatingResponse(BaseModel):
     id: int
     course_id: int
     student_id: int
     description: Optional[str]
-    file_id: str # In risposta mandiamo una stringa semplice
+    file_id: str
     created_at: datetime
+    average_rating: Optional[float] = None  # ← CAMPO AGGIUNTO
 
     class Config:
         from_attributes = True

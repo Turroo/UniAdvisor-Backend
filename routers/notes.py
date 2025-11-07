@@ -209,7 +209,7 @@ def get_course_notes_average(course_id: int, db: Session = Depends(get_db)):
     return {"course_id": course_id, "average_rating": round(avg_rating, 2)}
 
 # 9. Ottenere la lista ordinata degli appunti di un corso
-@router.get("/{course_id}/notes-sorted", response_model=list[NoteResponse])
+@router.get("/{course_id}/notes-sorted", response_model=list[NoteWithRatingResponse])
 def get_sorted_notes(course_id: int, order: str = "desc", db: Session = Depends(get_db)):
     print(f"🔍 GET /notes/{course_id}/notes-sorted called with order={order}")
     
