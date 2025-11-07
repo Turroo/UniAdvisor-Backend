@@ -211,6 +211,8 @@ def get_course_notes_average(course_id: int, db: Session = Depends(get_db)):
 # 9. Ottenere la lista ordinata degli appunti di un corso
 @router.get("/{course_id}/notes-sorted", response_model=list[NoteResponse])
 def get_sorted_notes(course_id: int, order: str = "desc", db: Session = Depends(get_db)):
+    print(f"🔍 GET /notes/{course_id}/notes-sorted called with order={order}")
+    
     notes_query = (
         db.query(Note, func.coalesce(func.avg(NoteRating.rating), -1).label("average_rating"))
         .outerjoin(NoteRating, Note.id == NoteRating.note_id)
@@ -224,14 +226,22 @@ def get_sorted_notes(course_id: int, order: str = "desc", db: Session = Depends(
         notes_query = notes_query.order_by(func.coalesce(func.avg(NoteRating.rating), -1).desc(), Note.created_at.desc())
 
     notes_with_ratings = notes_query.all()
+    print(f"📊 Query returned {len(notes_with_ratings)} notes")
     
-    # Manually construct the response to include average_rating if you add it to the schema
     result = []
     for note, avg_rating in notes_with_ratings:
+        print(f"   📝 Note ID={note.id}, avg_rating={avg_rating}, type={type(avg_rating).__name__}")
+        
+        # Check ratings count for this note
+        ratings_count = db.query(NoteRating).filter(NoteRating.note_id == note.id).count()
+        print(f"      ✅ This note has {ratings_count} ratings in DB")
+        
         note_dict = note.__dict__
         note_dict['average_rating'] = round(avg_rating, 2) if avg_rating != -1 else None
+        print(f"      ➡️ Final average_rating in response: {note_dict['average_rating']}")
         result.append(note_dict)
 
+    print(f"🎉 Returning {len(result)} notes")
     return result
 
 # 10. Ottenere gli appunti di un utente
