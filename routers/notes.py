@@ -10,7 +10,7 @@ from models.course import Course
 from models.note_ratings import NoteRating
 from models.user import User
 from models.report import Report
-from schemas.note import NoteCreate, NoteResponse
+from schemas.note import NoteCreate, NoteWithRatingResponse
 from schemas.rating import NoteRatingCreate, NoteRatingUpdate, NoteRatingResponse
 from schemas.report import ReportCreate, ReportResponse
 from auth.auth import get_current_user
@@ -18,7 +18,7 @@ from auth.auth import get_current_user
 router = APIRouter()
 
 # 1. Ottenere gli appunti per un corso
-@router.get("/{course_id}", response_model=list[NoteResponse])
+@router.get("/{course_id}", response_model=list[NoteWithRatingResponse])
 def get_notes(course_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
@@ -28,7 +28,7 @@ def get_notes(course_id: int, db: Session = Depends(get_db), current_user: User 
     return notes
 
 # 2. Caricare un nuovo appunto
-@router.post("/", response_model=NoteResponse)
+@router.post("/", response_model=NoteWithRatingResponse)
 def upload_note(
     note_data: NoteCreate,
     db: Session = Depends(get_db),
@@ -245,7 +245,7 @@ def get_sorted_notes(course_id: int, order: str = "desc", db: Session = Depends(
     return result
 
 # 10. Ottenere gli appunti di un utente
-@router.get("/usr/my-notes", response_model=list[NoteResponse])
+@router.get("/usr/my-notes", response_model=list[NoteWithRatingResponse])
 def get_my_notes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     user_notes = db.query(Note).filter(Note.student_id == current_user.id).all()
     if not user_notes:
