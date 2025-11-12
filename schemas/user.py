@@ -29,6 +29,7 @@ class UserResponse(BaseModel):
     city: str
     is_admin: bool
     faculty_id: Optional[int] = None
+    faculty_name: Optional[str] = None # Nome della facoltà associata
 
     class Config:
         from_attributes = True

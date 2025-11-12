@@ -55,15 +55,57 @@ def create_user_profile(
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+
+    return UserResponse(
+        id=new_user.id,
+        firebase_uid=new_user.firebase_uid,
+        email=new_user.email,
+        first_name=new_user.first_name,
+        last_name=new_user.last_name,
+        birth_date=new_user.birth_date,
+        city=new_user.city,
+        is_admin=new_user.is_admin,
+        faculty_id=new_user.faculty_id,
+        faculty_name=new_user.faculty.name if new_user.faculty else None
+    )
 
 
 @router.get("/me", response_model=UserResponse)
-def get_my_profile(current_user: User = Depends(get_current_user)):
+def get_my_profile(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Restituisce il profilo dell'utente attualmente loggato.
     """
-    return current_user
+    print("=" * 50)
+    print("📡 GET /users/me endpoint called")
+    print(f"👤 User ID: {current_user.id}")
+    print(f"👤 User Email: {current_user.email}")
+    print(f"🏫 Faculty ID: {current_user.faculty_id}")
+    
+    # ✅ Costruisci manualmente la risposta con faculty_name
+    if current_user.faculty:
+        print(f"✅ Faculty found: {current_user.faculty.name}")
+        faculty_name = current_user.faculty.name
+    else:
+        print("⚠️ No faculty assigned to this user")
+        faculty_name = None
+    
+    user_response = UserResponse(
+        id=current_user.id,
+        firebase_uid=current_user.firebase_uid,
+        email=current_user.email,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        birth_date=current_user.birth_date,
+        city=current_user.city,
+        is_admin=current_user.is_admin,
+        faculty_id=current_user.faculty_id,
+        faculty_name=faculty_name  # ✅ Popola faculty_name
+    )
+    
+    print(f"📤 Sending response with faculty_name: {faculty_name}")
+    print("=" * 50)
+    
+    return user_response
 
 
 @router.put("/me", response_model=UserResponse)
@@ -83,7 +125,19 @@ def update_my_profile(
 
     db.commit()
     db.refresh(current_user)
-    return current_user
+    
+    return UserResponse(
+        id=current_user.id,
+        firebase_uid=current_user.firebase_uid,
+        email=current_user.email,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        birth_date=current_user.birth_date,
+        city=current_user.city,
+        is_admin=current_user.is_admin,
+        faculty_id=current_user.faculty_id,
+        faculty_name=current_user.faculty.name if current_user.faculty else None
+    )
 
 
 @router.delete("/me")
