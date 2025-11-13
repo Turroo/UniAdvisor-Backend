@@ -247,10 +247,30 @@ def get_sorted_notes(course_id: int, order: str = "desc", db: Session = Depends(
 # 10. Ottenere gli appunti di un utente
 @router.get("/usr/my-notes", response_model=list[NoteWithRatingResponse])
 def get_my_notes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    user_notes = db.query(Note).filter(Note.student_id == current_user.id).all()
-    if not user_notes:
+    
+    user_notes_query = (
+        db.query(
+            Note,
+            func.coalesce(func.avg(NoteRating.rating), None).label("average_rating")
+        )
+        .outerjoin(NoteRating, Note.id == NoteRating.note_id)
+        .filter(Note.student_id == current_user.id)
+        .group_by(Note.id)
+        .all()
+    )
+    
+    if not user_notes_query:
         raise HTTPException(status_code=404, detail="You have not created any notes.")
-    return user_notes
+    
+    
+    result = []
+    for note, avg_rating in user_notes_query:
+        note_dict = note.__dict__.copy()
+        note_dict['average_rating'] = round(avg_rating, 2) if avg_rating else None
+        note_dict['course_name'] = note.course.name if note.course else "Unknown Course"
+        result.append(note_dict)
+    
+    return result
 
 # 11. Ottenere le valutazioni di un utente
 @router.get("/usr/my-reviews", response_model=list[NoteRatingResponse])

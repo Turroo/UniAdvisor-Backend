@@ -19,7 +19,8 @@ class NoteWithRatingResponse(BaseModel):
     description: Optional[str]
     file_id: str
     created_at: datetime
-    average_rating: Optional[float] = None  # ← CAMPO AGGIUNTO
+    average_rating: Optional[float] = None
+    course_name: Optional[str] = None
 
     class Config:
         from_attributes = True
