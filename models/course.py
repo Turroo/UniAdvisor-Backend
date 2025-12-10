@@ -22,3 +22,4 @@ class Course(Base):
     teacher = relationship("Teacher", back_populates="courses")
     notes = relationship("Note", back_populates="course", cascade="all, delete-orphan")
     reviews = relationship("Review", back_populates="course", cascade="all, delete-orphan")
+    lessons = relationship("Lesson", back_populates="course",cascade="all, delete-orphan")
