@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from routers import users, faculty, course, notes, admin, location
+from routers import users, faculty, course, notes, admin, location, lessons
 
 load_dotenv()
 
@@ -36,6 +36,7 @@ app.include_router(course.router, prefix="/courses", tags=["Courses"])
 app.include_router(notes.router, prefix="/notes", tags=["Notes"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 app.include_router(location.router, prefix="/location", tags=["Location & Maps"])
+app.include_router(lessons.router, prefix="/lessons", tags=["Lessons"])
 
 # --- Endpoint Radice ---
 @app.get("/", tags=["Root"])
@@ -49,7 +50,8 @@ def read_root():
             "Course Management",
             "Notes Sharing",
             "Reviews & Ratings",
-            "Campus Maps & Navigation"
+            "Campus Maps & Navigation",
+            "Lessons"
         ]
     }
 

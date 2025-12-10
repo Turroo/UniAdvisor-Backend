@@ -1,8 +1,22 @@
 from pydantic import BaseModel
 from datetime import time
 from typing import Optional
-# Importiamo lo schema del corso (che dovrebbe avere dentro l'aula)
-from .course import Course 
+
+# --- DEFINIZIONE "LITE" DEL CORSO (Per evitare circular imports) ---
+# Qui mappiamo esattamente i campi che hai nel tuo database (models/course.py)
+class CourseLocationInfo(BaseModel):
+    id: int
+    name: str
+    room_number: Optional[str] = None
+    building_name: Optional[str] = None
+    floor: Optional[int] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    teacher_name: Optional[str] = None
+
+    class Config:
+        from_attributes = True # Fix per Pydantic V2
+# -------------------------------------------------------------------
 
 class LessonBase(BaseModel):
     day_of_week: str
@@ -11,13 +25,12 @@ class LessonBase(BaseModel):
     course_id: int
 
 class LessonCreate(LessonBase):
-    pass # Non serve più classroom_id qui
+    pass
 
 class Lesson(LessonBase):
     id: int
-    # Includiamo l'intero oggetto Corso nella risposta
-    # così il frontend può fare: lesson.course.classroom.name
-    course: Optional[Course] = None 
+    # Qui includiamo l'oggetto CourseLocationInfo definito sopra
+    course: Optional[CourseLocationInfo] = None 
 
     class Config:
-        orm_mode = True
+        from_attributes = True # Fix per Pydantic V2

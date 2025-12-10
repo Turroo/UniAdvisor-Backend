@@ -23,3 +23,15 @@ class Course(Base):
     notes = relationship("Note", back_populates="course", cascade="all, delete-orphan")
     reviews = relationship("Review", back_populates="course", cascade="all, delete-orphan")
     lessons = relationship("Lesson", back_populates="course",cascade="all, delete-orphan")
+
+    @property
+    def teacher_name(self):
+        """Restituisce il nome del professore per gli schema Pydantic"""
+        if self.teacher:
+            # ATTENZIONE: Controlla come si chiamano i campi nel tuo modello Teacher!
+            # Se Teacher ha 'name':
+            # return self.teacher.name
+            
+            # Se Teacher ha 'first_name' e 'last_name' (più probabile):
+            return self.teacher.name
+        return None

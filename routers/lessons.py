@@ -7,8 +7,6 @@ import models.lesson as models
 import schemas.lesson as schemas
 
 router = APIRouter(
-    prefix="/lessons",
-    tags=["lessons"]
 )
 
 @router.post("/", response_model=schemas.Lesson)
