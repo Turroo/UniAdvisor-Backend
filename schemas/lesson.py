@@ -14,6 +14,9 @@ class CourseLocationInfo(BaseModel):
     longitude: Optional[float] = None
     teacher_name: Optional[str] = None
 
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
     class Config:
         from_attributes = True # Fix per Pydantic V2
 # -------------------------------------------------------------------
@@ -31,6 +34,7 @@ class Lesson(LessonBase):
     id: int
     # Qui includiamo l'oggetto CourseLocationInfo definito sopra
     course: Optional[CourseLocationInfo] = None 
+    checkins: int = 0
 
     class Config:
         from_attributes = True # Fix per Pydantic V2
