@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import time
+from datetime import time,date
 from typing import Optional
 
 # --- DEFINIZIONE "LITE" DEL CORSO (Per evitare circular imports) ---
@@ -35,6 +35,7 @@ class Lesson(LessonBase):
     # Qui includiamo l'oggetto CourseLocationInfo definito sopra
     course: Optional[CourseLocationInfo] = None 
     checkins: int = 0
+    last_checkin_date: Optional[date] = None
 
     class Config:
         from_attributes = True # Fix per Pydantic V2
